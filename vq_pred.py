@@ -424,7 +424,6 @@ if __name__ == '__main__':
                     "passage_count", "passage_retrieval_en", "passage_retrieval_zh", "lcc", "repobench-p"]
 
     datasets = ["multifieldqa_en", "hotpotqa", "triviaqa", "passage_retrieval_en"]
-    datasets = ["triviaqa", "passage_retrieval_en"]
     dataset2prompt = json.load(open("config/dataset2prompt.json", "r"))
     dataset2maxlen = json.load(open("config/dataset2maxlen.json", "r"))
     if not os.path.exists("pred"):

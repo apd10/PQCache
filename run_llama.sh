@@ -3,16 +3,16 @@ set -x
 # "original", "pq_search", "sparq_f", "infllm", "h2o"
 SEED="4321"
 COMPRESSOR="pq_search" 
-EXP_NAME=pq_${SEED}_rerun_v0
+EXP_NAME="baseline_pqcache_16x"
 MODE="off" # profile or off 
 DEVICE=0
-COMPRESS=0.1 # TODO
+COMPRESS=0.071 # 1/16
 CORE_OFFSET=0 # 100 160
-TOPK=0.5 # TODO
-RECENT_RATIO=0.5 # TODO
-SINK_SIZE=32 #TODO
-SUBVEC=2
-SUBBITS=6
+TOPK=0.9 # TODO
+RECENT_RATIO=0.1 # TODO # handled via max(128,) in code to match the HashAttention
+SINK_SIZE=128 #TODO
+SUBVEC=1
+SUBBITS=8
 TOPR=1
 METRIC="euc" # euc ip
 GQA="True" # True False

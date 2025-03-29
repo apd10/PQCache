@@ -2919,8 +2919,48 @@ class GenerationMixin:
         this_peer_finished = False
         unfinished_sequences = torch.ones(batch_size, dtype=torch.long, device=input_ids.device)
         model_kwargs = self._get_initial_cache_position(input_ids, model_kwargs)
-        import pdb
-        pdb.set_trace()
+
+        OFF = 128
+        # prefill stage
+        full_model_inputs = self.prepare_inputs_for_generation(input_ids, **model_kwargs)
+        full_model_inputs = copy.deepcopy(full_model_inputs)
+        first_model_inputs = {}
+        #print("GEN", "full", full_model_inputs)
+        for key in full_model_inputs.keys():
+            if key in ['input_ids', 'attention_mask', 'position_ids']:
+                first_model_inputs[key] = full_model_inputs[key][:,:-OFF]
+            elif key in ["cache_position"]:
+                first_model_inputs[key] = full_model_inputs[key][:-OFF]
+            else:
+                first_model_inputs[key] = full_model_inputs[key]
+        first_model_inputs.update({"output_attentions": output_attentions} if output_attentions else {})
+        first_model_inputs.update({"output_hidden_states": output_hidden_states} if output_hidden_states else {})
+        #print("GEN", "first", first_model_inputs)
+        outputs = self(**first_model_inputs, return_dict=True)
+        #print("GEN", "first-post", first_model_inputs)
+        full_model_inputs['past_key_values'] = outputs.past_key_values
+        del outputs
+        for i in range(OFF):
+            next_model_inputs = {}
+            for key in full_model_inputs.keys():
+                if key in ['input_ids', 'position_ids']:
+                    next_model_inputs[key] = full_model_inputs[key][:,-OFF+i].unsqueeze(-1)
+                elif key in ['cache_position']:
+                    next_model_inputs[key] = full_model_inputs[key][-OFF+i].unsqueeze(-1)
+                elif key in ['attention_mask']:
+                    if i < OFF-1:
+                        next_model_inputs[key] = full_model_inputs[key][:,:-OFF+i+1]
+                    else:
+                        next_model_inputs[key] = full_model_inputs[key][:,:]
+                else:
+                    next_model_inputs[key] = full_model_inputs[key]
+            next_model_inputs.update({"output_attentions": output_attentions} if output_attentions else {})
+            next_model_inputs.update({"output_hidden_states": output_hidden_states} if output_hidden_states else {})
+
+            #print("GEN", "next", next_model_inputs)
+            outputs = self(**next_model_inputs, return_dict=True)
+            full_model_inputs['past_key_values'] = outputs.past_key_values
+            del outputs
 
         while self._has_unfinished_sequences(this_peer_finished, synced_gpus, device=input_ids.device):
             # prepare model inputs
