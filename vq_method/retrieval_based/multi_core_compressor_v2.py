@@ -100,10 +100,11 @@ def compute_kmeans_worker(
     cpu_num = mp.cpu_count()
     cur_pid = os.getpid()
     if n_core >= 1:
-        cpu_use = int(n_core)
+        cpu_use = n_core
         if idx == -1:
             os.sched_setaffinity(cur_pid, list(range(cpu_num))[-2:-1])
         else:
+            print("####",idx, cur_pid, list(range(cpu_num))[core_offset + cpu_use * (idx+1) : core_offset + cpu_use * (idx+2)], flush=True)
             os.sched_setaffinity(cur_pid, list(range(cpu_num))[core_offset + cpu_use * (idx+1) : core_offset + cpu_use * (idx+2)])
     else:
         assert int(n_core * task_cnt) == 1, f"{n_core},{task_cnt}"
@@ -249,7 +250,8 @@ class MultiCoreCompressor_v2:
         self.cent_cnt = max_cent_cnt
 
         self.proc_cnt = process_cnt
-        self.n_core_per_proc = core_per_process
+        #self.n_core_per_proc = core_per_process
+        self.n_core_per_proc = 1
         mp.set_start_method("spawn", force=True)
 
         self.compress_cnt = 0

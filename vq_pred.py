@@ -1,5 +1,5 @@
 import os
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
 import torch
 import json
 import torch.nn as nn
@@ -423,6 +423,8 @@ if __name__ == '__main__':
                     "dureader", "gov_report", "qmsum", "multi_news", "vcsum", "trec", "triviaqa", "samsum", "lsht", \
                     "passage_count", "passage_retrieval_en", "passage_retrieval_zh", "lcc", "repobench-p"]
 
+    datasets = ["multifieldqa_en", "hotpotqa", "triviaqa", "passage_retrieval_en"]
+    datasets = ["triviaqa", "passage_retrieval_en"]
     dataset2prompt = json.load(open("config/dataset2prompt.json", "r"))
     dataset2maxlen = json.load(open("config/dataset2maxlen.json", "r"))
     if not os.path.exists("pred"):
@@ -435,13 +437,15 @@ if __name__ == '__main__':
     for dataset in datasets:
         logger.info(f"Yes we are evaluating {dataset}")
         if args.e:
-            data = load_dataset('./data', f"{dataset}_e", split='test')
-            if not os.path.exists(f"pred_e/{model_name}"):
-                os.makedirs(f"pred_e/{model_name}")
-            out_path = f"pred_e/{model_name}/{dataset}.jsonl"
+            data = load_dataset('./data', f"{dataset}", split='test')
+            if not os.path.exists(f"pred/{model_name}"):
+                os.makedirs(f"pred/{model_name}")
+            out_path = f"pred/{model_name}/{dataset}.jsonl"
         else:
-            data = load_dataset('json', data_files='./data/' +
-                                dataset+'.jsonl', split='train')
+            data = load_from_disk(
+                    f"./data/{dataset}"
+                )
+
             exp_name = args.exp_name
             if not os.path.exists(f"pred/{model_name}"):
                 os.makedirs(f"pred/{model_name}")

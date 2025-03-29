@@ -5,12 +5,12 @@ SEED="4321"
 COMPRESSOR="pq_search" 
 EXP_NAME=pq_${SEED}_rerun_v0
 MODE="off" # profile or off 
-DEVICE=0,1
-COMPRESS=0.1
-CORE_OFFSET=100 # 100 160
-TOPK=0.5
-RECENT_RATIO=0.5
-SINK_SIZE=32
+DEVICE=0
+COMPRESS=0.1 # TODO
+CORE_OFFSET=0 # 100 160
+TOPK=0.5 # TODO
+RECENT_RATIO=0.5 # TODO
+SINK_SIZE=32 #TODO
 SUBVEC=2
 SUBBITS=6
 TOPR=1
@@ -57,4 +57,4 @@ python vq_pred.py \
     --topr ${TOPR} \
     --gqa ${GQA} \
     --sparq_mean_v_trick ${MEAN_V_TRICK} \
-    --max_iter ${MAX_ITER}
+    --max_iter ${MAX_ITER} \

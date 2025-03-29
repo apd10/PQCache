@@ -1,4 +1,4 @@
 {
     "mistral-7b-Instruct-32k": "mistralai/Mistral-7B-Instruct-v0.2",
-    "llama-3.1": "meta-llama/Llama-3.1-8B"
+    "llama-3.1": "meta-llama/Llama-3.1-8B-Instruct"
 }

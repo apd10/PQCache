@@ -81,11 +81,11 @@ def initialize_objects(config, model):
                                                     layer_cnt = config.num_hidden_layers,
                                                     model_name=model)
     elif ("llama" in model or "Llama" in model) and "2" in model:
-        process_cnt = min(32 * eval(os.environ.get("SUBVEC",2)), MAX_WORKER_CNT)
+        process_cnt = min(8 * eval(os.environ.get("SUBVEC",2)), MAX_WORKER_CNT)
         global_compressor = MultiCoreCompressor_v2(cpu_key_bufs,
                                                     offload_events,
                                                     process_cnt=process_cnt,
-                                                    core_per_process = MAX_CPU_IN_USE // process_cnt, 
+                                                    core_per_process = 1, 
                                                     max_km_groups = 32 * eval(os.environ.get("SUBVEC",2)),
                                                     max_seq_len=config.max_seq_len,
                                                     dim=128 // eval(os.environ.get("SUBVEC",2)),
